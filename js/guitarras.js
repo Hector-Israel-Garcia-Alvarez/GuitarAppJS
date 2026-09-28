@@ -1,0 +1,87 @@
+// guitarras.js
+export const db = [
+    {
+        id: 1,
+        nombre: 'Lukather',
+        imagen: 'guitarra_01',
+        descripcion: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit quae labore odit magnam in autem nesciunt, amet deserunt',
+        precio: 299,
+    },
+    {
+        id: 2,
+        nombre: 'SRV',
+        imagen: 'guitarra_02',
+        descripcion: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit quae labore odit magnam in autem nesciunt, amet deserunt',
+        precio: 299,
+    },
+    {
+        id: 3,
+        nombre: 'Borland',
+        imagen: 'guitarra_03',
+        descripcion: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit quae labore odit magnam in autem nesciunt, amet deserunt',
+        precio: 299,
+    },
+    {
+        id: 4,
+        nombre: 'Vai',
+        imagen: 'guitarra_04',
+        descripcion: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit quae labore odit magnam in autem nesciunt, amet deserunt',
+        precio: 299,
+    },
+    {
+        id: 5,
+        nombre: 'Thompson',
+        imagen: 'guitarra_05',
+        descripcion: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit quae labore odit magnam in autem nesciunt, amet deserunt',
+        precio: 299,
+    },
+    {
+        id: 6,
+        nombre: 'White',
+        imagen: 'guitarra_06',
+        descripcion: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit quae labore odit magnam in autem nesciunt, amet deserunt',
+        precio: 299,
+    },
+    {
+        id: 7,
+        nombre: 'Cobain',
+        imagen: 'guitarra_07',
+        descripcion: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit quae labore odit magnam in autem nesciunt, amet deserunt',
+        precio: 299,
+    },
+    {
+        id: 8,
+        nombre: 'Dale',
+        imagen: 'guitarra_08',
+        descripcion: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit quae labore odit magnam in autem nesciunt, amet deserunt',
+        precio: 299,
+    },
+    {
+        id: 9,
+        nombre: 'Krieger',
+        imagen: 'guitarra_09',
+        descripcion: 'Lorem ipsum, dolor sit amet contentur...',
+        precio: 299,
+    },
+    {
+        id: 10,
+        nombre: 'Campbell',
+        imagen: 'guitarra_10',
+        descripcion: 'Lorem ipsum, dolor sit amet contentur...',
+        precio: 299,
+    },
+    {
+        id: 11,
+        nombre: 'Reed',
+        imagen: 'guitarra_11',
+        descripcion: 'Lorem ipsum, dolor sit amet contentur...',
+        precio: 299,
+    },
+    {
+        id: 12,
+        nombre: 'Hazel',
+        imagen: 'guitarra_12',
+        descripcion: 'Lorem ipsum, dolor sit amet contentur...',
+        precio: 299,
+    }
+];
