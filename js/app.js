@@ -5,15 +5,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const 
         carritoContenedor = document.querySelector('#carrito tbody'),
         totalPagarHTML = document.querySelector('.text-end .fw-bold'),
-        vaciarCarritoBtn = document.querySelector('.text-end + button'),
+        totalPagarContenedor = document.querySelector('.text-end'),
+        tablaCarrito = document.querySelector('#carrito table'),
+        vaciarCarritoBtn = document.querySelector('#vaciar-carrito'),
         mensajeVacio = document.querySelector('#carrito > p'),
         btnLukather = document.querySelector('#btn-lukather');
 
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
-    // Evento exclusivo para el botón de la guitarra Lukather (id: 1 en la base de datos)
+    // Verificamos que el botón exista antes de agregarle el evento
     if (btnLukather) {
-        btnLukather.addEventListener('click', () => {
+        btnLukather.addEventListener('click', (e) => {
+            e.preventDefault();
             agregarGuitarraLukather();
         });
     }
@@ -24,7 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Buscamos la guitarra Lukather en la base de datos (id 1)
         const guitarraLukather = db.find(g => g.id === 1);
         
-        // Revisar si ya existe en el carrito
+        if (!guitarraLukather) return;
+
         const existe = carrito.some(guitarra => guitarra.id === guitarraLukather.id);
         
         if (existe) {
@@ -47,15 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (carrito.length === 0) {
             mensajeVacio.style.display = 'block';
-            const tabla = document.querySelector('#carrito table');
-            if (tabla) tabla.style.display = 'none';
-            if (totalPagarHTML) totalPagarHTML.parentElement.style.display = 'none';
+            if (tablaCarrito) tablaCarrito.style.display = 'none';
+            if (totalPagarContenedor) totalPagarContenedor.style.display = 'none';
             if (vaciarCarritoBtn) vaciarCarritoBtn.style.display = 'none';
         } else {
             mensajeVacio.style.display = 'none';
-            const tabla = document.querySelector('#carrito table');
-            if (tabla) tabla.style.display = 'table';
-            if (totalPagarHTML) totalPagarHTML.parentElement.style.display = 'block';
+            if (tablaCarrito) tablaCarrito.style.display = 'table';
+            if (totalPagarContenedor) totalPagarContenedor.style.display = 'block';
             if (vaciarCarritoBtn) vaciarCarritoBtn.style.display = 'block';
 
             let total = 0;
@@ -67,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>
-                        <img class="img-fluid" src="./public/img/${imagen}.jpg" alt="imagen guitarra" width="80">
+                        <img class="img-fluid" src="./public/img/${imagen}.jpg" alt="imagen guitarra" width="60">
                     </td>
                     <td>${nombre}</td>
                     <td class="fw-bold">$${precio}</td>
@@ -85,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 carritoContenedor.appendChild(row);
             });
 
-            totalPagarHTML.textContent = `$${total}`;
+            if (totalPagarHTML) totalPagarHTML.textContent = `$${total}`;
         }
 
         sincronizarStorage();

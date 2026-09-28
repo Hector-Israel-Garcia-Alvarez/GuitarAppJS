@@ -4,7 +4,7 @@ export const db = [
         id: 1,
         nombre: 'Lukather',
         imagen: 'guitarra_01',
-        descripcion: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit quae labore odit magnam in autem nesciunt, amet deserunt',
+        descripcion: 'Lorem ipsum...',
         precio: 299,
     },
     {
