@@ -1,151 +1,185 @@
-// app.js
-import { db } from './guitarras.js';
+// Imports
+import {db} from "./guitarras.js";
+console.log(db)
+// Variables
+const container = document.querySelector('h2 + div')
+const divCarrito = document.querySelector('#carrito')
+const header = document.querySelector('.header')
+let carrito = []
 
-document.addEventListener('DOMContentLoaded', () => {
-    const 
-        carritoContenedor = document.querySelector('#carrito tbody'),
-        totalPagarHTML = document.querySelector('.text-end .fw-bold'),
-        totalPagarContenedor = document.querySelector('.text-end'),
-        tablaCarrito = document.querySelector('#carrito table'),
-        vaciarCarritoBtn = document.querySelector('#vaciar-carrito'),
-        mensajeVacio = document.querySelector('#carrito > p'),
-        btnLukather = document.querySelector('#btn-lukather');
+// Funciones
+function createCard(guitar){
+    const div = document.createElement('div')
+    div.classList = 'col-md-6 col-lg-4 my-4 row align-items-center'
+    const html = `<div class="col-4">
+                    <img class="img-fluid" src="./public/img/${guitar.imagen}.jpg" alt="${guitar.nombre}">
+                </div>
+                <div class="col-8">
+                    <h3 class="text-black fs-4 fw-bold text-uppercase">${guitar.nombre}</h3>
+                    <p>${guitar.descripcion}</p>
+                    <p class="fw-black text-primary fs-3">${guitar.precio}</p>
+                    <button 
+                    data-id="${guitar.id}"
+                        type="button"
+                        class="btn btn-dark w-100 "
+                    >Agregar al Carrito</button>
+                </div>`
+    div.innerHTML = html
+    return div
+}
 
-    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+function drawCar(){
+    const div = document.createElement('div')
+    if(carrito.length === 0){
+        div.innerHTML = `<p class="text-center">El carrito esta vacio</p>`
+    }else{
+        let html = `<table class="w-100 table">
+                                <thead>
+                                    <tr>
+                                        <th>Imagen</th>
+                                        <th>Nombre</th>
+                                        <th>Precio</th>
+                                        <th>Cantidad</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>`
+        carrito.forEach(guitar => {
+            html += `<tr>
+                                        <td>
+                                            <img class="img-fluid" src="./public/img/${guitar.imagen}.jpg" alt="${guitar.nombre}">
+                                        </td>
+                                        <td>${guitar.nombre}</td>
+                                        <td class="fw-bold">
+                                                $${guitar.precio}
+                                        </td>
+                                        <td>
+                                            <button
+                                                type="button"
+                                                class="btn btn-dark"
+                                                data-action="decrement"
+                                                data-id="${guitar.id}"
+                                            >
+                                                -
+                                            </button>
+                                                ${guitar.cantidad}
+                                            <button
+                                                type="button"
+                                                class="btn btn-dark"
+                                                data-action="increment"
+                                                data-id="${guitar.id}"
+                                            > 
+                                                +
+                                            </button>
+                                           
+                                        </td>
+                                        <td>
+                                            <button
+                                                class="btn btn-danger"
+                                                type="button"
+                                                data-action="remove"
+                                                data-id="${guitar.id}"
+                                            >
+                                                X
+                                            </button>
+                                           
+                                        </td>
+                                    </tr>`
+        })
 
-    // Verificamos que el botón exista antes de agregarle el evento
-    if (btnLukather) {
-        btnLukather.addEventListener('click', (e) => {
-            e.preventDefault();
-            agregarGuitarraLukather();
-        });
+        html += `</tbody>
+                            </table>
+
+                            <p class="text-end">Total pagar: <span class="fw-bold">$${carrito.reduce((total, guitar) => total + (guitar.precio * guitar.cantidad), 0).toFixed(2)}</span></p>
+                            <button class="btn btn-dark w-100 mt-3 p-2" type="button" data-action="clear">Vaciar Carrito
+                            </button>
+                            `
+        div.innerHTML = html
     }
+     divCarrito.innerHTML = ''
+     divCarrito.appendChild(div)                      
+}
 
-    sincronizarCarrito();
-
-    function agregarGuitarraLukather() {
-        // Buscamos la guitarra Lukather en la base de datos (id 1)
-        const guitarraLukather = db.find(g => g.id === 1);
-        
-        if (!guitarraLukather) return;
-
-        const existe = carrito.some(guitarra => guitarra.id === guitarraLukather.id);
-        
-        if (existe) {
-            carrito = carrito.map(guitarra => {
-                if (guitarra.id === guitarraLukather.id) {
-                    guitarra.cantidad++;
-                }
-                return guitarra;
-            });
-        } else {
-            const nuevaGuitarra = { ...guitarraLukather, cantidad: 1 };
-            carrito.push(nuevaGuitarra);
+function getGuitar(e){
+    if(e.target.closest('#carrito')) return
+    if(e.target.classList.contains('btn')) {
+        const id = e.target.getAttribute('data-id')
+        const idselected = db.findIndex(g => g.id == Number(id))
+        const idInCart = carrito
+                        .findIndex(gInCart => gInCart.id == Number(id))
+        if( idInCart === -1){
+             carrito.push({
+                ...db[idselected], 
+                cantidad: 1
+            })
+        }else{
+            
+            carrito[idInCart].cantidad++
         }
 
-        sincronizarCarrito();
+        writeStorage()
+       drawCar()
+       
+    }
+    
+}
+
+function updateCart(e){
+    const button = e.target.closest('button[data-action]')
+
+    if(!button) return
+
+    e.stopPropagation()
+
+    const id = Number(button.dataset.id)
+    const index = carrito.findIndex(guitar => guitar.id === id)
+
+    if(button.dataset.action === 'clear'){
+        carrito.length = 0
+        writeStorage()
+        drawCar()
+        return
     }
 
-    function sincronizarCarrito() {
-        limpiarHTML();
-        
-        if (carrito.length === 0) {
-            mensajeVacio.style.display = 'block';
-            if (tablaCarrito) tablaCarrito.style.display = 'none';
-            if (totalPagarContenedor) totalPagarContenedor.style.display = 'none';
-            if (vaciarCarritoBtn) vaciarCarritoBtn.style.display = 'none';
-        } else {
-            mensajeVacio.style.display = 'none';
-            if (tablaCarrito) tablaCarrito.style.display = 'table';
-            if (totalPagarContenedor) totalPagarContenedor.style.display = 'block';
-            if (vaciarCarritoBtn) vaciarCarritoBtn.style.display = 'block';
+    if(index === -1) return
 
-            let total = 0;
-
-            carrito.forEach(guitarra => {
-                const { id, imagen, nombre, precio, cantidad } = guitarra;
-                total += precio * cantidad;
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>
-                        <img class="img-fluid" src="./public/img/${imagen}.jpg" alt="imagen guitarra" width="60">
-                    </td>
-                    <td>${nombre}</td>
-                    <td class="fw-bold">$${precio}</td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <button type="button" class="btn btn-dark btn-sm restar" data-id="${id}">-</button>
-                            <span>${cantidad}</span>
-                            <button type="button" class="btn btn-dark btn-sm sumar" data-id="${id}">+</button>
-                        </div>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger btn-sm borrar" type="button" data-id="${id}">X</button>
-                    </td>
-                `;
-                carritoContenedor.appendChild(row);
-            });
-
-            if (totalPagarHTML) totalPagarHTML.textContent = `$${total}`;
-        }
-
-        sincronizarStorage();
-        agregarEventosAccionesCarrito();
+    if(button.dataset.action === 'increment'){
+        carrito[index].cantidad++
     }
 
-    function sincronizarStorage() {
-        localStorage.setItem('carrito', JSON.stringify(carrito));
-    }
+    if(button.dataset.action === 'decrement'){
+        carrito[index].cantidad--
 
-    function limpiarHTML() {
-        while (carritoContenedor.firstChild) {
-            carritoContenedor.removeChild(carritoContenedor.firstChild);
+        if(carrito[index].cantidad <= 0){
+            carrito.splice(index, 1)
         }
     }
 
-    function agregarEventosAccionesCarrito() {
-        // Botones Sumar (+)
-        document.querySelectorAll('.sumar').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                carrito = carrito.map(item => {
-                    if (item.id === id) item.cantidad++;
-                    return item;
-                });
-                sincronizarCarrito();
-            });
-        });
-
-        // Botones Restar (-)
-        document.querySelectorAll('.restar').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                carrito = carrito.map(item => {
-                    if (item.id === id && item.cantidad > 1) {
-                        item.cantidad--;
-                    }
-                    return item;
-                });
-                sincronizarCarrito();
-            });
-        });
-
-        // Botón Borrar individual (X)
-        document.querySelectorAll('.borrar').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                carrito = carrito.filter(item => item.id !== id);
-                sincronizarCarrito();
-            });
-        });
+    if(button.dataset.action === 'remove'){
+        carrito.splice(index, 1)
     }
 
-    // Vaciar Carrito completo
-    if (vaciarCarritoBtn) {
-        vaciarCarritoBtn.addEventListener('click', () => {
-            carrito = [];
-            sincronizarCarrito();
-        });
-    }
-});
+    writeStorage()
+    drawCar()
+}
+
+function readStorage(){
+    const data = localStorage.getItem('carrito')
+    carrito = data? JSON.parse(data) : []
+    
+}
+
+function writeStorage(){
+    localStorage.setItem('carrito', JSON.stringify(carrito))
+}
+
+db.forEach(guitar => {
+    container.appendChild(createCard(guitar))
+})
+
+readStorage()
+drawCar()
+// Listeners
+container.addEventListener('click', getGuitar)
+header.addEventListener('click', getGuitar)
+divCarrito.addEventListener('click', updateCart)
